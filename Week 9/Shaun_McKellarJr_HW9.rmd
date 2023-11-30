@@ -1,0 +1,200 @@
+# Intro to Data Science - HW 9
+##### Copyright Jeffrey Stanton, Jeffrey Saltz, Christopher Dunham, and Jasmina Tacheva
+
+
+```{r}
+# Enter your name here: Shaun McKellar Jr
+```
+
+### Attribution statement: (choose only one and delete the rest)
+
+
+```{r}
+# 1. I did this homework by myself, with help from the book and the professor.
+```
+
+**Text mining** plays an important role in many industries because of the prevalence of text in the interactions between customers and company representatives. Even when the customer interaction is by speech, rather than by chat or email, speech to text algorithms have gotten so good that transcriptions of these spoken word interactions are often available. To an increasing extent, a data scientist needs to be able to wield tools that turn a body of text into actionable insights. In this homework, we explore a real **City of Syracuse dataset** using the **quanteda** and **quanteda.textplots** packages. Make sure to install the **quanteda** and **quanteda.textplots** packages before following the steps below:<br>
+
+```{r}
+library(arules)
+library(tidyverse)
+library(dplyr)
+library(caret)
+library(ggplot2)
+library(arulesViz)
+library(quanteda)
+library(quanteda.textplots)
+library(quanteda.textstats)
+```
+
+## Part 1: Load and visualize the data file  
+A.	Take a look at this article: https://samedelstein.medium.com/snowplow-naming-contest-data-2dcd38272caf and write a comment in your R script, briefly describing what it is about.<br>
+
+
+```{r}
+#The article discusses Syracuse's snowplow naming contest, revealing that nearly 2,000 unique submissions were received, including humorous options like "Plowie McPlowFace."
+```
+
+B.	Read the data from the following URL into a dataframe called **df**:
+https://intro-datascience.s3.us-east-2.amazonaws.com/snowplownames.csv
+
+
+```{r}
+df <- read_csv("https://intro-datascience.s3.us-east-2.amazonaws.com/snowplownames.csv")
+```
+
+C.	Inspect the **df** dataframe – which column contains an explanation of the meaning of each submitted snowplow name? Transform that column into a **document-feature matrix**, using the **corpus()**, **tokens()**, **tokens_select(), and **dfm()** functions. Do not forget to **remove stop words**.
+
+Hint: Make sure you have libraried *quanteda*
+
+
+```{r}
+#Inspecting the df dataframe.
+glimpse(df)
+```
+```{r}
+#The column called "meaning" gives data on the explanation of each name
+df$meaning
+```
+```{r}
+library(quanteda)
+```
+
+
+```{r}
+
+```
+
+```{r}
+dfCorpus <- corpus(df$meaning, docnames = df$submission_number)
+```
+
+```{r}
+toks <- tokens(dfCorpus, remove_punct = TRUE)
+```
+
+```{r}
+toks_nonstop <- tokens_select(toks, pattern = stopwords("en"), selection = "remove")
+```
+
+```{r}
+dfDFM <- dfm(toks_nonstop)
+```
+
+D.	Plot a **word cloud**, where a word is only represented if it appears **at least 2 times** . **Hint:** use **textplot_wordcloud()**:
+
+Hint: Make sure you have libraried (and installed if needed) *quanteda.textplots* 
+
+
+```{r}
+textplot_wordcloud(dfDFM,min_count  =   2)
+```
+
+E.	Next, **increase the minimum count to 10**. What happens to the word cloud? **Explain in a comment**. 
+
+
+```{r}
+textplot_wordcloud(dfDFM, min_count = 10)
+```
+
+```{r}
+#The size of the word clouds breadth shrinks significantly, removing a lot of infrequently words
+
+```
+
+F.	What are the top words in the word cloud? Explain in a brief comment.
+
+
+```{r}
+#The top words in the word cloud, provided above, include "snow", "syracuse", "city", "plow", "1/2".
+```
+
+## Part 2: Analyze the sentiment of the descriptions
+
+A.	Create a **named list of word counts by frequency**.<br>
+
+output the 10 most frequent words (their word count and the word). <br>
+
+**Hint**: use **textstat_frequency()** from the *quanteda.textstats* package.
+
+
+```{r}
+textstat_frequency(dfDFM,n=10)
+```
+
+B.	Explain in a comment what you observed in the sorted list of word counts. 
+
+
+```{r}
+#In this sorted word count list, it's apparent that there are still some irrelevant entries, such as "1/2" and "ï." Another important consideration is that the word "plow," ranked 6th with 140 appearances, and "plows," ranked 8th with 100 appearances, are essentially the same word and might need to be combined.
+```
+
+## Part 3: Match the words with positive and negative words 
+
+A.	Read in the list of positive words, using the scan() function, and output the first 5 words in the list. Do the same for the  the negative words list: <br>
+<br>
+https://intro-datascience.s3.us-east-2.amazonaws.com/positive-words.txt
+<br>
+https://intro-datascience.s3.us-east-2.amazonaws.com/negative-words.txt <br>
+<br>
+
+There should be 2006 positive words and 4783 negative words, so you may need to clean up these lists a bit. 
+
+
+```{r}
+postitive_url <- "https://intro-datascience.s3.us-east-2.amazonaws.com/positive-words.txt"
+
+positive_words <- scan(postitive_url, character(0), sep = "\n")
+positive_words <- positive_words[-1:-34]
+
+length(positive_words)
+```
+
+B.	Use **dfm_match()** to match the words in the dfm with the words in posWords). Note that **dfm_match()** creates a new dfm.
+
+Then pass this new dfm to the **textstat_frequency()** function to see the positive words in our corpus, and how many times each word was mentioned.
+
+
+```{r}
+post_dfm <- dfm_match(dfDFM, positive_words)
+
+post_freq <- textstat_frequency(post_dfm)
+
+nrow(post_freq)
+```
+
+C. Sum all the positive words
+
+
+```{r}
+sum(post_freq$frequency)
+```
+
+D. Do a similar analysis for the negative words - show the 10 most requent negative words and then sum the negative words in the document.
+
+
+```{r}
+negative_url <- "https://intro-datascience.s3.us-east-2.amazonaws.com/negative-words.txt"
+negative_words <- scan(negative_url, character(0), sep = "\n")
+negative_words <-negative_words[-1:-34]
+
+length(negative_words)
+```
+
+```{r}
+negative_dfm <- dfm_match(dfDFM, negative_words)
+
+negative_freq <- textstat_frequency(negative_dfm)
+nrow(negative_freq)
+```
+
+```{r}
+sum(negative_freq$frequency)
+```
+
+E.	Write a comment describing what you found after matching positive and negative words. Which group is more common in this dataset? Might some of the negative words not actually be used in a negative way?  What about the positive words?
+
+
+```{r}
+#In our observations, it's evident that there were more matches for positive words (866) compared to negative words (255), indicating a higher prevalence of positive terms. However, it's worth noting that the exact count of negative words, as well as positive ones, might vary due to potential contextual discrepancies.
+```
