@@ -1,0 +1,158 @@
+# Introduction to Data Science HW 4
+##### Copyright Jeffrey Stanton, Jeffrey Saltz, and Jasmina Tacheva
+
+
+```{r}
+# Enter your name here: Shaun Mckellar Jr
+```
+
+### Attribution statement: (choose only one and delete the rest)
+
+
+```{r}
+# 2. I did this homework with help from the book and the professor and these Internet sources:Youtube
+```
+
+Reminders of things to practice from previous weeks: <br>
+Descriptive statistics: 	mean( ) max( ) min( )<br>
+Coerce to numeric:		as.numeric( )<br>
+
+## Part 1: Use the Starter Code 
+
+Below, I have provided a starter file to help you. <br>
+
+Each of these lines of code **must be commented** (the comment must that explains what is going on, so that I know you understand the code and results).
+
+
+```{r}
+library(tidyverse)
+library(dplyr)
+#Decoding JSON
+library(jsonlite)
+#URL OF JSON Data
+dataset <- url("https://intro-datascience.s3.us-east-2.amazonaws.com/role.json")
+#Converts the JSON data into a structured R object
+readlines <- jsonlite::fromJSON(dataset)
+#Used to access nested elements within the readlines object
+df <- readlines$objects$person
+```
+
+A.	Explore the **df** dataframe (e.g., using head() or whatever you think is best).
+
+
+```{r}
+head(df)
+df
+```
+
+B.	Explain the dataset <br>
+o	What is the dataset about? <br>
+o	How many rows are there and what does a row represent?<br>
+o	How many columns and what does each column represent?<br>
+
+
+
+```{r}
+#To find the details about the dataset using the summary function and you get the details of the dataset.
+summary(df)
+#The row reps the records in the dataset
+nrow(df)
+#To find the number of columns in a dataset using the ncold function
+ncol(df)
+#To find a columns in a dataset using the colnames function
+colnames(df)
+```
+
+C. What does running this line of code do? Explain in a comment:
+
+
+```{r}
+#The substr function is for get substring in data or a vector. If you look at the birthday it contains the values like "1951-05-20"
+vals <- substr(df$birthday,1,4)
+```
+
+D. Create a new attribute 'age' - how old the person is 
+**Hint:** You may need to convert it to numeric first.
+
+
+```{r}
+#The vals variable contains the year and we have to convert it using the as.numeric function
+old <- as.numeric(vals)
+#Create a new variable age with value as the current year and then subtracts with the birth year from the old variable to get the age.
+age <- 2021-old
+age
+```
+
+E. Create a function that reads in the role json dataset, and adds the age attribute to the dataframe, and returns that dataframe
+
+
+```{r}
+#We are having to add the age to the dataset df using the data.frame function.
+df <- data.frame(df,age)
+head(df)
+```
+
+F. Use (call, invoke) the function, and store the results in df
+
+
+```{r}
+#Importing the dplyr library using the library function
+library(dplyr)
+df%>%filter(gender=='female')%>%nrow()
+```
+
+## Part 2: Investigate the resulting dataframe 'df'
+
+A.	How many senators are women? 
+
+
+```{r}
+#Importing the dplyr library using the library function
+library(dplyr)
+women <- sum(df$gender == "female")
+women
+```
+
+B.	How many senators have a YouTube account?  
+
+
+```{r}
+#Importing the dplyr library using the library function
+library(dplyr)
+df%>%filter(youtubeid != 'NA')%>%nrow()
+```
+
+C.	 How many women senators have a YouTube account?
+
+
+```{r}
+library(dplyr)
+df%>%filter(gender=='female' & youtubeid !='NA')%>%nrow()
+```
+
+D.	Create a new dataframe called **youtubeWomen** that only includes women senators who have a YouTube account.   
+
+
+```{r}
+library(dplyr)
+youtubeWomen <- df%>%filter(gender=='female' & youtubeid != 'NA')
+youtubeWomen
+```
+
+E.	Make a histogram of the **age** of senators in **youtubeWomen**, and then another for the senetors in **df**. Add a comment describing the shape of the distributions.
+
+
+```{r}
+#Importing the dplyr library using the library function
+library(dplyr)
+#To make the a histogram we have to use the hist function. We pass the age column from the df data uing the $ operator, and xlab for label x-axis.
+hist(youtubeWomen$age,xlab = 'Age')
+```
+```{r}
+#Importing the dplyr library using the library function
+library(dplyr)
+#To make the a histogram we have to use the hist function. We pass the age column from the df data uing the $ operator, and xlab for label x-axis.
+hist(df$age,xlab = 'Age')
+```
+
+It seems the age of the senators are between 60-70. Most of the senators are older than 60 as well. The most common age for Women that are senators are in their 60s.
