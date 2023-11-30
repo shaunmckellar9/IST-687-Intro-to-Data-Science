@@ -1,0 +1,164 @@
+---
+title: "Intro to Data Science - HW 10 - Shiny"
+output: html_document
+runtime: shiny
+---
+
+##### Copyright Jeffrey Stanton, Jeffrey Saltz, Christopher Dunham, and Jasmina Tacheva
+
+```{r}
+# Enter your name here: Shaun McKellar Jr
+```
+
+
+### Attribution statement: (choose only one and delete the rest)
+
+```{r}
+# 1. I did this homework by myself, with help from the book and the professor.
+```
+
+At a high level, we want to create a scatter plot, where the user can select what is the x axis and the y axis of the scatter plot. We will use the same dataset as used in our first ggplot homework.
+
+The size and color will be represented by the year attribute, and the user will be able to choose one of the following (for  the x and the y axis):
+new_sp_m014
+new_sp_f014
+new_sp_m65
+new_sp_f65
+
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(shinyFiles)
+library(shiny)
+library(curl)
+```
+
+## Read in the same dataset we used for the ggplot homework
+
+The file is: "https://intro-datascience.s3.us-east-2.amazonaws.com/who.csv" and store it in the *tb* dataframe
+```{r}
+tb <- read_csv("https://intro-datascience.s3.us-east-2.amazonaws.com/who.csv", show_col_types = FALSE) 
+```
+## Clean up the dataset, just like we did in the ggplot homework.
+
+First, remove na's from iso2
+```{r}
+tb = subset(tb, is.na(tb$iso2) == FALSE )
+```
+
+
+Now create the dataframe 'tbCan', which is the iso2 for canada (CA)
+```{r}
+tbCan <- subset(tb,tb$iso2 == 'CA')
+```
+
+We will need the imputeTS package (only install if needed)
+```{r}
+#install.packages('imputeTS')
+library(imputeTS)
+```
+
+Now we can use 'na_interpolation for new_sp_m014
+```{r}
+tbCan$new_sp_m014 <- na_interpolation(tbCan$new_sp_m014)
+```
+
+
+## Create the User Interface of our shiny app
+
+Define the sidebarPanel, which is two choices (use 'selectInput'), one for the x axis of the scatter plot, and the other is the y axis for the scatter plot. (make sure to library shiny).
+```{r}
+
+inputChoices <- c(
+      "males aged 0-14 years" = "new_sp_m014",
+      "females aged 0-14 years" = "new_sp_f014",
+      "males aged 65 years and over" = "new_sp_m65",
+      "females aged 65 and over" = "new_sp_f65")
+sidePanel <- sidebarPanel(
+    #your code goes here
+     selectInput("variable1", "X-axis:",inputChoices),
+  selectInput("variable2", "Y-axis:", inputChoices),width = 10   )
+
+```
+
+Create the mainPanel to show the scatter plot.
+
+```{r}
+mainPanel <-  mainPanel(
+    # your code goes here
+       plotOutput("distplot"))
+```
+
+# Define UI for application (called ui)
+
+Use a 'fluidPage' using the sidebarLayout, and your sidePanel and mainPanel
+```{r}
+ui1 <- fluidPage(
+
+    # Application title
+    titlePanel("Tuberculosis cases in Canada"),
+
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+
+         #add the slider
+      sidebarPanel(
+        sliderInput("Bins", "Number of bins:", min = 0, max = 1000, value = 500),sidePanel),
+      plotOutput("plot"))
+)
+```
+
+## Now let's define the server
+
+Use ggplot to render a scatter plot, using the tbCan dataframe, the input for the x-axis and the input for the y-axis.
+
+Store the results in the 'server' variable
+
+```{r}
+server2 <- function(input, output) {
+
+  tbCan <- readtb()
+  output$plot <- renderPlot(
+    ggplot(tbCan, aes(x=tbCan[,input$variable1], y=tbCan[,input$variable2])) 
+    + ylab(input$variable2) + xlab(input$variable1)
+    + geom_point(aes(size = year, color= year )) + stat_summary_bin(fun.y = 'mean',bins = input$Bins,color = 'orange',size = 2, geom = 'point')
+  ) 
+}
+  
+  #is the same as the one previously defined
+readtb <- function() {
+  #cleanup
+  testFrame <- read.csv(curl("https://intro-datascience.s3.us-east-2.amazonaws.com/who.csv")) 
+  testFrame = subset(testFrame, is.na(testFrame$iso2) == FALSE )
+  testFrame <- subset(testFrame,testFrame$iso2 == 'CA')
+  testFrame$new_sp_m014 <- na_interpolation(testFrame$new_sp_m014)
+  
+  #convert columns to numbers
+ 
+  testFrame$new_sp_m014 <-Numberize(testFrame$new_sp_m014)
+  testFrame$new_sp_f014 <-Numberize(testFrame$new_sp_f014)
+  testFrame$new_sp_m65 <-Numberize(testFrame$new_sp_m65)
+  testFrame$new_sp_f65 <-Numberize(testFrame$new_sp_f65)
+  
+  rownames(testFrame) <- NULL
+  return(testFrame)
+}
+
+Numberize <- function(inputVector)
+{
+  # Get rid of commas
+  inputVector<-gsub(",","", inputVector)
+  # Get rid of spaces
+  inputVector<-gsub(" ","", inputVector)
+  return(as.numeric(inputVector))
+}
+
+```
+
+Now run the shiny App
+```{r}
+# Run the application 
+shinyApp(ui = ui1, server = server2)
+```

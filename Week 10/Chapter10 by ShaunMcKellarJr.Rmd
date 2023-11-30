@@ -1,0 +1,72 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(maps)
+library(mapproj)
+library(dplyr)
+library(jsonlite)
+library(caret)
+```
+
+```{r}
+oilChanges <- c(3,5,2,3,1,4,6,4,3,2,0,10,7,8)
+repairs <- c(300, 300, 500, 400, 700, 420, 100, 290,
+             475, 620, 600, 0, 200, 50)
+miles <- c(20100, 23200, 19200, 22100, 18400, 23400, 
+           17900, 19900, 20100, 24100, 18200, 19600, 20800, 
+           19700)
+```
+
+
+```{r}
+oil <- data.frame(oilChanges, repairs, miles)
+View(oil)
+```
+
+
+```{r}
+plot(oil$oilChanges, oil$repairs)
+```
+
+```{r}
+ggplot(oil, aes(x=miles, y=repairs)) + geom_point()
+```
+
+```{r}
+model1 <- lm(formula=repairs ~ oilChanges, data=oil)
+summary(model1)
+```
+
+```{r}
+plot(oil$oilChanges, oil$repairs)
+abline(model1)
+```
+```{r}
+#The model suggests that we should do as many oil changes as possible.
+
+#It predicts very low close to 0 repairs if we do 9 or more oil changes, but about $680 if we do no oil changes.
+```
+
+
+
+```{r}
+m <- lm(formula = repairs ~ oilChanges + miles,
+        data = oil)
+summary(oil)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
