@@ -1,0 +1,195 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(tidyverse)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(kernlab)
+library(ggplot2)
+library(tidyverse)
+library(maps)
+library(mapproj)
+library(jsonlite)
+library(corrr)
+```
+
+
+
+
+```{r}
+HousePrices <- read_csv('house_prices.csv')
+colnames(HousePrices)
+```
+```{r}
+colnames(HousePrices)
+
+
+row.names(HousePrices)
+```
+```{r}
+head(HousePrices)
+```
+```{r}
+getwd()
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+str(HousePrices)
+```
+
+```{r}
+missing_values <- colSums(is.na(HousePrices))
+
+```
+
+```{r}
+print(missing_values)
+```
+
+```{r}
+str(HousePrices)
+```
+
+```{r}
+ncol(HousePrices)
+```
+
+
+```{r}
+nrow(HousePrices)
+```
+
+
+```{r}
+str(missing_values)
+```
+
+```{r}
+threshold_percent <- 50
+```
+
+```{r}
+# Calculate the percentage of missing values in each column
+missing_percent <- (colSums(is.na(HousePrices)) / nrow(HousePrices)) * 100
+```
+
+
+```{r}
+columns_to_keep <- missing_percent <= threshold_percent
+
+```
+
+```{r}
+filtered_Housing_Prices <- HousePrices[, columns_to_keep]
+
+```
+
+```{r}
+str(filtered_Housing_Prices)
+```
+
+```{r}
+print(filtered_Housing_Prices)
+```
+
+
+```{r}
+filtered_Housing_Prices
+```
+
+```{r}
+# Drop rows with NaN values in the 'Price (in rupees)' column
+filtered_housing_prices <- HousePrices[complete.cases(HousePrices$`Price (in rupees)`),]
+```
+
+
+```{r}
+filtered_housing_prices
+```
+
+```{r}
+# Drop rows with NaN values in the 'Carpet Area' column
+filtered_house_prices <- HousePrices[complete.cases(HousePrices$`Carpet Area`), ]
+```
+
+```{r}
+print(filtered_house_prices)
+```
+
+```{r}
+# Remove 'Dimensions' and 'Plot Area' columns
+filtered_house_prices <- HousePrices[, !names(HousePrices) %in% c("Dimensions", "Plot Area")]
+```
+
+
+```{r}
+print(filtered_Housing_Prices)
+```
+```{r}
+# Convert 'Price (in rupees)' values from Lakhs to Crores
+filtered_house_prices$`Price (in rupees)` <- filtered_house_prices$`Price (in rupees)` / 100
+```
+
+```{r}
+# Display the 'Price (in rupees)' column
+head(filtered_house_prices$`Price (in rupees)`)
+```
+
+```{r}
+head(filtered_Housing_Prices)
+```
+
+```{r}
+# Remove rows with NA values
+Cleaned_House_Prices <- na.omit(filtered_Housing_Prices)
+```
+
+
+```{r}
+head(Cleaned_House_Prices)
+```
+
+```{r}
+str(Cleaned_House_Prices)
+```
+
+```{r}
+view(Cleaned_House_Prices$`Carpet Area`)
+```
+
+
+```{r}
+# Create a bar plot to compare the counts of "Ready to Move" vs. "Not Ready"
+ggplot(data = Cleaned_House_Prices, aes(x = Status, fill = Status)) +
+  geom_bar() +
+  labs(title = "Comparison of 'Ready to Move' vs. 'Not Ready'",
+       x = "Status",
+       y = "Count") +
+  scale_fill_manual(values = c("Ready to Move" = "green", "Not Ready" = "red"))
+```
+
+```{r}
+# Print the correlation coefficient
+print(correlation)
+```
+
+```{r}
+view(Cleaned_House_Price$Status)
+```
+
