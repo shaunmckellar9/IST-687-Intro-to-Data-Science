@@ -1,0 +1,128 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Intro to Data Science - HW 1
+
+##### Copyright Jeffrey Stanton, Jeffrey Saltz, and Jasmina Tacheva
+
+```{r}
+# Enter your name here: Shaun Mckellar Jr
+```
+
+### Attribution statement: (choose only one and delete the rest)
+
+```{r}
+# 1. I did this homework by myself, with help from the book and the professor.
+```
+
+Define a variable:
+
+```{r}
+x <- 280
+```
+
+Define the following vectors, which represent the **population** (in thousands) and **number of colleges** in each of the five counties in Central New York (CNY) -- **Cayuga**, **Cortland**, **Madison**, **Onondaga**, and **Oswego**, in this order:
+
+```{r}
+population <- c(80, 49, 73, 467, 122)
+colleges <- c(2, 2, 3, 9, 2)
+```
+
+# Part 1: Calculating statistics using R
+
+A.  Show the number of observations in the **population** vector with the length() function:
+
+```{r}
+length(population)
+```
+
+B.  Show the number of observations in the **colleges** vector with the length() function:
+
+```{r}
+length(colleges)
+```
+
+C.  Calculate the average CNY population using the mean() function:
+
+```{r}
+mean(population)
+```
+
+D.  Calculate the average number of colleges in CNY using the mean() function:
+
+```{r}
+mean(colleges)
+```
+
+E.  Calculate the total CNY population using the sum() function:
+
+```{r}
+sum(population)
+```
+
+F.  Calculate the total number of colleges in CNY using the sum() function:
+
+```{r}
+sum(colleges)
+```
+
+G.  Calculate the average CNY population again, this time using **the results from steps A & E**:
+
+```{r}
+sum(population)/length(population)
+```
+
+H.  Calculate the average number of colleges in CNY again, this time using **the results from steps B & F**:
+
+```{r}
+sum(colleges)/length(colleges)
+```
+
+# Part 2: Using the max/min and range functions in {r}
+
+I.  How many colleges does the county with most colleges have? Hint: Use the max() function:
+
+```{r}
+max(colleges)
+```
+
+J.  What is the population of the least populous county in CNY? **Hint:** Use the min() function:
+
+```{r}
+min(population)
+```
+
+K.  Display the populations of the least populous and most populous county in the dataset together. **Hint:** Use the range() function:
+
+```{r}
+range(population)
+```
+
+# Part 3: Vector Math
+
+L.  Create a new vector called **extraPop**, which is the current population of a county **+ 50** (each county has 50,000 more people):
+
+```{r}
+extraPop <- population +50
+```
+
+M.  Calculate the average of **extraPop**:
+
+```{r}
+mean(extraPop)
+```
+
+N.  In a variable called **bigCounties**, store all the population numbers from the original **population** vector which are **greater than 120** (using **subsetting** in R):
+
+```{r}
+bigCounties <- population[population > 120]
+```
+
+O.  Report the length of **bigCounties**:
+
+```{r}
+length(bigCounties)
+```
